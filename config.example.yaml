@@ -1,0 +1,9 @@
+name: "example-server"
+transport:
+  redis:
+    on: true
+    host: localhost
+    port: 6379
+    username:
+    password:
+    database: 0
