@@ -9,6 +9,7 @@
 These integrations are:
 
 - [x] Redis
+- [ ] RabbitMQ
 - [ ] P2P Protocol
 - [ ] TCP
 
