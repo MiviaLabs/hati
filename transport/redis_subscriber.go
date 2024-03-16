@@ -29,7 +29,7 @@ func NewRedisSubscriber(channel types.Channel, sub *redis.PubSub, wg *sync.WaitG
 }
 
 func (rs *RedisSubscriber) Start(callback func(payload []byte) error) error {
-	log.Debug("starting redis subscriber: " + string(rs.channel))
+	log.Debug("    starting redis subscriber: " + string(rs.channel))
 
 	rs.wg.Add(1)
 	go func(s *RedisSubscriber) {
@@ -48,7 +48,7 @@ func (rs *RedisSubscriber) Start(callback func(payload []byte) error) error {
 					}
 				}
 			case <-s.subCloseChan:
-				log.Debug("stopping redis subscriber: " + string(s.channel))
+				log.Debug("    stopping redis subscriber: " + string(s.channel))
 				break Loop
 			}
 		}

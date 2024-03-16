@@ -5,8 +5,8 @@ import "github.com/MiviaLabs/hati/common/types"
 type Transport interface {
 	Start() error
 	Stop() error
-	Send(payload []byte) error
-	// Send(channel Channel, payload []byte) error
+	Send(transportType types.TransportType, target string, payload []byte) error
+	Publish(channel types.Channel, payload []byte) error
 	Subscribe(channel types.Channel, callback func(payload []byte)) error
 }
 

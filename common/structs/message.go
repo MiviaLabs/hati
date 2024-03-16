@@ -1,4 +1,4 @@
-package transport
+package structs
 
 import "encoding/json"
 
@@ -11,19 +11,18 @@ type Message[P []byte] struct {
 	WaitForResponse bool         `json:"wait_for_response"`
 }
 
-// func (m Message[P]) GetPayload()(P, error) {
+func (m *Message[P]) MarshalMessage() ([]byte, error) {
+	bytes, err := json.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	return bytes, nil
+}
 
-// }
-
-func (m Message[P]) Unmarshal(out *P) error {
+func (m *Message[P]) UnmarshalPayload(out any) error {
 	if err := json.Unmarshal(m.Payload, out); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-type TargetAction struct {
-	Module string `json:"module"`
-	Action string `json:"action"`
 }

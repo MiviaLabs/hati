@@ -3,6 +3,7 @@ package core
 import (
 	"errors"
 
+	"github.com/MiviaLabs/hati/common/interfaces"
 	"github.com/MiviaLabs/hati/log"
 	"github.com/MiviaLabs/hati/module"
 	"github.com/MiviaLabs/hati/transport"
@@ -12,7 +13,7 @@ import (
 type Hati struct {
 	config           Config
 	modules          map[string]module.Module
-	transportManager transport.TransportManager
+	transportManager interfaces.TransportManager
 	stopChan         chan bool
 }
 
@@ -20,7 +21,7 @@ func NewHati(config Config) Hati {
 	return Hati{
 		config:           config,
 		modules:          make(map[string]module.Module),
-		transportManager: transport.NewTransportManager(config.Transport),
+		transportManager: transport.NewTransportManager(config.Name, config.Transport),
 		stopChan:         make(chan bool),
 	}
 }
@@ -30,6 +31,8 @@ func (h Hati) AddModule(modules ...module.Module) error {
 		if h.modules[module.Name].Name == module.Name {
 			return errors.New("module " + module.Name + " already exist")
 		}
+
+		module.SetTransportManager(&h.transportManager)
 
 		h.modules[module.Name] = module
 	}
@@ -70,4 +73,8 @@ func (h Hati) Stop() error {
 	}
 
 	return nil
+}
+
+func (h Hati) TransportManager() *interfaces.TransportManager {
+	return &h.transportManager
 }
