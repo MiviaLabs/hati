@@ -1,6 +1,11 @@
 # Hati
 
-**Build distributed applications with Hati** or don't, choice is yours.
+<p align="center" width="100%">
+<img src="./docs/images/gopher-golang.png" alt="golang gopher" width="250"/>
+</p>
+<p align="center" width="100%">
+<strong>Build distributed applications with Hati</strong>
+</p>
 
 ```text
 Project is in development - it is not advisable to use it in production at this stage.

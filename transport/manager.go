@@ -3,6 +3,7 @@ package transport
 import (
 	"encoding/json"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/MiviaLabs/hati/common/interfaces"
@@ -20,12 +21,13 @@ const (
 )
 
 type TransportManager struct {
-	modules            map[string]interfaces.Module
-	serverName         string
-	config             TransportManagerConfig
-	redis              *Redis
-	moduleManager      interfaces.ModuleManager
-	waitingForResponse map[string]chan structs.Message[[]byte]
+	modules                map[string]interfaces.Module
+	serverName             string
+	config                 TransportManagerConfig
+	redis                  *Redis
+	moduleManager          interfaces.ModuleManager
+	waitingForResponse     map[string]chan structs.Message[[]byte]
+	waitingForResponseLock sync.Mutex
 }
 
 type TransportManagerConfig struct {
@@ -118,21 +120,30 @@ func (tm TransportManager) Publish(transportType types.TransportType, channel ty
 			}
 
 			if msg.WaitForResponse {
+				tm.waitingForResponseLock.Lock()
 				tm.waitingForResponse[msg.Hash] = make(chan structs.Message[[]byte])
+				tm.waitingForResponseLock.Unlock()
+
 				timer := time.NewTimer(time.Duration(1) * time.Second)
 
 			Loop:
 				for {
 					select {
 					case res := <-tm.waitingForResponse[msg.Hash]:
+						tm.waitingForResponseLock.Lock()
+
 						close(tm.waitingForResponse[msg.Hash])
 
 						tm.waitingForResponse[msg.Hash] = nil
+						tm.waitingForResponseLock.Unlock()
 						return res, nil
 					case <-timer.C:
+						tm.waitingForResponseLock.Lock()
+
 						close(tm.waitingForResponse[msg.Hash])
 
 						tm.waitingForResponse[msg.Hash] = nil
+						tm.waitingForResponseLock.Unlock()
 						break Loop
 					}
 				}
@@ -209,12 +220,14 @@ func (tm TransportManager) ReceiveMessageResponse(payload []byte) (types.Respons
 	}
 
 	if message.TargetID != tm.serverName {
-		return nil, errors.New("i am not the target")
+		return nil, nil
 	}
 
+	tm.waitingForResponseLock.Lock()
 	if tm.waitingForResponse[message.ResponseHash] != nil {
 		tm.waitingForResponse[message.ResponseHash] <- *message
 	}
+	tm.waitingForResponseLock.Unlock()
 
 	return nil, nil
 }
