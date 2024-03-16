@@ -18,6 +18,17 @@ These integrations are:
 - [ ] RabbitMQ
 - [ ] P2P Protocol
 
+Hati server works on a simple concept of modules and actions (methods) - they can receive payloads through internal channels from other Hati servers which are in the network, as well as through HTTP requests in case if your are building api.
+
+Hait comes with few handy integrations for different databases:
+
+- [ ] MySQL
+- [ ] PostgreSQL
+- [ ] SQLite
+- [ ] BadgerDB
+- [ ] CouchDB
+- [ ] MongoDB
+
 ## How does that work?
 
 I'll tell you later :-)
