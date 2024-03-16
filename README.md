@@ -20,6 +20,13 @@ Feel free to play around and leave feedback :)
 These integrations are:
 
 - [x] Redis
+
+  - [ ] Presistent messages - streams
+
+  - [x] Not persistent messages - pub/sub
+  - [x] Waiting for response from remote - timeout 1s
+  - [x] Option to send without waiting for response from remote
+
 - [ ] RabbitMQ
 - [ ] P2P Protocol
 
