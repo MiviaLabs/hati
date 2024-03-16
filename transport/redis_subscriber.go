@@ -62,7 +62,11 @@ func (rs *RedisSubscriber) Start(callback func(payload []byte) (types.Response, 
 		for {
 			select {
 			case payload := <-s.outChan:
-				callback([]byte(payload))
+				_, err := callback([]byte(payload))
+				if err != nil {
+					log.Error(err.Error())
+					continue
+				}
 			case <-s.subCallbackCloseChan:
 				break Loop
 			}

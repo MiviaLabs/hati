@@ -1,6 +1,11 @@
 package structs
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+
+	"github.com/ethereum/go-ethereum/crypto"
+)
 
 type Message[P []byte] struct {
 	Hash            string       `json:"hash"`
@@ -9,6 +14,12 @@ type Message[P []byte] struct {
 	TargetAction    TargetAction `json:"target_action"`
 	Payload         P            `json:"payload"`
 	WaitForResponse bool         `json:"wait_for_response"`
+	ResponseHash    string       `json:"response_hash"`
+}
+
+func (m *Message[P]) UpdateHash() {
+	hash := crypto.Keccak256([]byte(m.FromID), []byte(m.TargetID), []byte(m.TargetAction.Module), []byte(m.TargetAction.Action), m.Payload, []byte(time.Now().String()))
+	m.Hash = crypto.Keccak256Hash(hash).String()
 }
 
 func (m *Message[P]) MarshalMessage() ([]byte, error) {
