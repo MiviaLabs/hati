@@ -88,7 +88,7 @@ func (r *Redis) Publish(channel types.Channel, payload []byte) error {
 	return r.publishers[string(channel)].Publish(payload)
 }
 
-func (r *Redis) Subscribe(channel types.Channel, callback func(payload []byte) error) error {
+func (r *Redis) Subscribe(channel types.Channel, callback func(payload []byte) (types.Response, error)) error {
 	ctx := context.Background()
 	sub := r.subscriberClient.Subscribe(ctx, string(channel))
 

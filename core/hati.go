@@ -1,8 +1,6 @@
 package core
 
 import (
-	"errors"
-
 	"github.com/MiviaLabs/hati/common/interfaces"
 	"github.com/MiviaLabs/hati/log"
 	"github.com/MiviaLabs/hati/module"
@@ -12,32 +10,26 @@ import (
 
 type Hati struct {
 	config           Config
-	modules          map[string]module.Module
+	moduleManager    interfaces.ModuleManager
 	transportManager interfaces.TransportManager
 	stopChan         chan bool
 }
 
 func NewHati(config Config) Hati {
-	return Hati{
-		config:           config,
-		modules:          make(map[string]module.Module),
-		transportManager: transport.NewTransportManager(config.Name, config.Transport),
-		stopChan:         make(chan bool),
+
+	hati := Hati{
+		config:   config,
+		stopChan: make(chan bool),
 	}
+
+	hati.moduleManager = module.NewModuleManager()
+	hati.transportManager = transport.NewTransportManager(config.Name, config.Transport, hati.moduleManager)
+
+	return hati
 }
 
-func (h Hati) AddModule(modules ...module.Module) error {
-	for _, module := range modules {
-		if h.modules[module.Name].Name == module.Name {
-			return errors.New("module " + module.Name + " already exist")
-		}
-
-		module.SetTransportManager(&h.transportManager)
-
-		h.modules[module.Name] = module
-	}
-
-	return nil
+func (h Hati) AddModule(modules ...interfaces.Module) error {
+	return h.moduleManager.AddModule(modules...)
 }
 
 func (h Hati) Start() error {
@@ -50,10 +42,8 @@ func (h Hati) Start() error {
 		return err
 	}
 
-	for _, module := range h.modules {
-		if err := module.Start(); err != nil {
-			return err
-		}
+	if err := h.moduleManager.Start(); err != nil {
+		return err
 	}
 
 	return nil
@@ -66,10 +56,8 @@ func (h Hati) Stop() error {
 		return err
 	}
 
-	for _, module := range h.modules {
-		if err := module.Stop(); err != nil {
-			return err
-		}
+	if err := h.moduleManager.Stop(); err != nil {
+		return err
 	}
 
 	return nil

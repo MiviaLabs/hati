@@ -28,7 +28,7 @@ func NewRedisSubscriber(channel types.Channel, sub *redis.PubSub, wg *sync.WaitG
 	}
 }
 
-func (rs *RedisSubscriber) Start(callback func(payload []byte) error) error {
+func (rs *RedisSubscriber) Start(callback func(payload []byte) (types.Response, error)) error {
 	log.Debug("    starting redis subscriber: " + string(rs.channel))
 
 	rs.wg.Add(1)
