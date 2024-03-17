@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/MiviaLabs/hati/common/interfaces"
+	"github.com/MiviaLabs/hati/common"
 	"github.com/MiviaLabs/hati/log"
 	"github.com/MiviaLabs/hati/module"
 	"github.com/MiviaLabs/hati/transport"
@@ -10,8 +10,8 @@ import (
 
 type Hati struct {
 	config           Config
-	moduleManager    interfaces.ModuleManager
-	transportManager interfaces.TransportManager
+	moduleManager    common.ModuleManager
+	transportManager common.TransportManager
 	stopChan         chan bool
 }
 
@@ -28,7 +28,7 @@ func NewHati(config Config) Hati {
 	return hati
 }
 
-func (h Hati) AddModule(modules ...interfaces.Module) error {
+func (h Hati) AddModule(modules ...common.Module) error {
 	return h.moduleManager.AddModule(modules...)
 }
 
@@ -63,6 +63,6 @@ func (h Hati) Stop() error {
 	return nil
 }
 
-func (h Hati) TransportManager() *interfaces.TransportManager {
+func (h Hati) TransportManager() *common.TransportManager {
 	return &h.transportManager
 }

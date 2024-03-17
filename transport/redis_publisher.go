@@ -4,20 +4,20 @@ import (
 	"context"
 	"sync"
 
-	"github.com/MiviaLabs/hati/common/types"
+	"github.com/MiviaLabs/hati/common"
 	"github.com/MiviaLabs/hati/log"
 	redis "github.com/redis/go-redis/v9"
 )
 
 type RedisPublisher struct {
-	channel      types.Channel
+	channel      common.Channel
 	pub          *redis.Client
 	pubCloseChan chan bool
 	inChan       chan string
 	wg           *sync.WaitGroup
 }
 
-func NewRedisPublisher(channel types.Channel, pub *redis.Client, wg *sync.WaitGroup) *RedisPublisher {
+func NewRedisPublisher(channel common.Channel, pub *redis.Client, wg *sync.WaitGroup) *RedisPublisher {
 	return &RedisPublisher{
 		channel:      channel,
 		pub:          pub,

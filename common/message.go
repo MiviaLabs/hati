@@ -1,11 +1,10 @@
-package structs
+package common
 
 import (
 	"encoding/json"
 	"time"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	routing "github.com/qiangxue/fasthttp-routing"
 )
 
 type Message[P []byte] struct {
@@ -16,7 +15,6 @@ type Message[P []byte] struct {
 	Payload         P            `json:"payload"`
 	WaitForResponse bool         `json:"wait_for_response"`
 	ResponseHash    string       `json:"response_hash"`
-	RoutingContext  *routing.Context
 }
 
 func (m *Message[P]) UpdateHash() {

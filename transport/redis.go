@@ -5,14 +5,14 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/MiviaLabs/hati/common/types"
+	"github.com/MiviaLabs/hati/common"
 	"github.com/MiviaLabs/hati/log"
 	"github.com/adjust/rmq/v5"
 	redis "github.com/redis/go-redis/v9"
 )
 
 var (
-	ErrRedisAlreadySubscribed = func(channel types.Channel) error {
+	ErrRedisAlreadySubscribed = func(channel common.Channel) error {
 		return errors.New("already subscribed to this channel: " + string(channel))
 	}
 )
@@ -74,7 +74,7 @@ func (r *Redis) Start() error {
 	return nil
 }
 
-func (r *Redis) Publish(channel types.Channel, payload []byte) error {
+func (r *Redis) Publish(channel common.Channel, payload []byte) error {
 	if r.publishers[string(channel)] == nil {
 		log.Debug("starting redis publisher: " + string(channel))
 
@@ -88,7 +88,7 @@ func (r *Redis) Publish(channel types.Channel, payload []byte) error {
 	return r.publishers[string(channel)].Publish(payload)
 }
 
-func (r *Redis) Subscribe(channel types.Channel, callback func(payload []byte) (types.Response, error)) error {
+func (r *Redis) Subscribe(channel common.Channel, callback func(payload []byte) (common.Response, error)) error {
 	ctx := context.Background()
 	sub := r.subscriberClient.Subscribe(ctx, string(channel))
 

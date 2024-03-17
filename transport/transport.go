@@ -1,13 +1,13 @@
 package transport
 
-import "github.com/MiviaLabs/hati/common/types"
+import "github.com/MiviaLabs/hati/common"
 
 type Transport interface {
 	Start() error
 	Stop() error
-	Send(transportType types.TransportType, target string, payload []byte) error
-	Publish(channel types.Channel, payload []byte) error
-	Subscribe(channel types.Channel, callback func(payload []byte)) error
+	Send(transportType common.TransportType, target string, payload []byte) error
+	Publish(channel common.Channel, payload []byte) error
+	Subscribe(channel common.Channel, callback func(payload []byte)) error
 }
 
 // type Transport struct{}

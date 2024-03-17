@@ -1,15 +1,15 @@
 package transport
 
 import (
+	"github.com/MiviaLabs/hati/common"
 	"sync"
 
-	"github.com/MiviaLabs/hati/common/types"
 	"github.com/MiviaLabs/hati/log"
 	redis "github.com/redis/go-redis/v9"
 )
 
 type RedisSubscriber struct {
-	channel              types.Channel
+	channel              common.Channel
 	sub                  *redis.PubSub
 	subCloseChan         chan bool
 	subCallbackCloseChan chan bool
@@ -17,7 +17,7 @@ type RedisSubscriber struct {
 	wg                   *sync.WaitGroup
 }
 
-func NewRedisSubscriber(channel types.Channel, sub *redis.PubSub, wg *sync.WaitGroup) *RedisSubscriber {
+func NewRedisSubscriber(channel common.Channel, sub *redis.PubSub, wg *sync.WaitGroup) *RedisSubscriber {
 	return &RedisSubscriber{
 		channel:              channel,
 		sub:                  sub,
@@ -28,7 +28,7 @@ func NewRedisSubscriber(channel types.Channel, sub *redis.PubSub, wg *sync.WaitG
 	}
 }
 
-func (rs *RedisSubscriber) Start(callback func(payload []byte) (types.Response, error)) error {
+func (rs *RedisSubscriber) Start(callback func(payload []byte) (common.Response, error)) error {
 	log.Debug("    starting redis subscriber: " + string(rs.channel))
 
 	rs.wg.Add(1)

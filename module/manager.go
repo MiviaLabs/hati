@@ -2,25 +2,24 @@ package module
 
 import (
 	"errors"
-
-	"github.com/MiviaLabs/hati/common/interfaces"
+	"github.com/MiviaLabs/hati/common"
 )
 
 type Manager struct {
-	interfaces.ModuleManager
-	modules          map[string]interfaces.Module
-	transportManager interfaces.TransportManager
+	common.ModuleManager
+	modules          map[string]common.Module
+	transportManager common.TransportManager
 }
 
 func NewModuleManager() *Manager {
 	return &Manager{
-		modules: make(map[string]interfaces.Module),
+		modules: make(map[string]common.Module),
 	}
 }
 
-func (m *Manager) AddModule(modules ...interfaces.Module) error {
+func (m *Manager) AddModule(modules ...common.Module) error {
 	for _, module := range modules {
-		if m.modules[module.GetName()] != nil && interfaces.Module(m.modules[module.GetName()]).GetName() == module.GetName() {
+		if m.modules[module.GetName()] != nil && common.Module(m.modules[module.GetName()]).GetName() == module.GetName() {
 			return errors.New("module " + module.GetName() + " already exist")
 		}
 
@@ -32,15 +31,15 @@ func (m *Manager) AddModule(modules ...interfaces.Module) error {
 	return nil
 }
 
-func (m *Manager) GetModules() *map[string]interfaces.Module {
+func (m *Manager) GetModules() *map[string]common.Module {
 	return &m.modules
 }
 
-func (m *Manager) SetTransportManager(tm interfaces.TransportManager) {
+func (m *Manager) SetTransportManager(tm common.TransportManager) {
 	m.transportManager = tm
 }
 
-func (m *Manager) GetModule(name string) interfaces.Module {
+func (m *Manager) GetModule(name string) common.Module {
 	return m.modules[name]
 }
 

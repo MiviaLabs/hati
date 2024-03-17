@@ -1,4 +1,4 @@
-package interfaces
+package common
 
 type HttpServer interface {
 	Start() error

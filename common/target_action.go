@@ -1,4 +1,4 @@
-package structs
+package common
 
 type TargetAction struct {
 	Module string `json:"module"`

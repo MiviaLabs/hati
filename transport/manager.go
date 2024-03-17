@@ -6,9 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/MiviaLabs/hati/common/interfaces"
-	"github.com/MiviaLabs/hati/common/structs"
-	"github.com/MiviaLabs/hati/common/types"
+	"github.com/MiviaLabs/hati/common"
 	"github.com/MiviaLabs/hati/log"
 )
 
@@ -17,17 +15,17 @@ var (
 )
 
 const (
-	REDIS_TYPE types.TransportType = "redis"
+	REDIS_TYPE common.TransportType = "redis"
 )
 
 type TransportManager struct {
-	modules                map[string]interfaces.Module
+	modules                map[string]common.Module
 	serverName             string
 	config                 TransportManagerConfig
 	redis                  *Redis
 	httpServer             *HttpServer
-	moduleManager          interfaces.ModuleManager
-	waitingForResponse     map[string]chan structs.Message[[]byte]
+	moduleManager          common.ModuleManager
+	waitingForResponse     map[string]chan common.Message[[]byte]
 	waitingForResponseLock sync.Mutex
 }
 
@@ -36,25 +34,25 @@ type TransportManagerConfig struct {
 	Http  HttpConfig  `yaml:"http" json:"http"`
 }
 
-func NewTransportManager(serverName string, config TransportManagerConfig, moduleManager interfaces.ModuleManager) *TransportManager {
+func NewTransportManager(serverName string, config TransportManagerConfig, moduleManager common.ModuleManager) *TransportManager {
 	tm := &TransportManager{
 		serverName:         serverName,
 		config:             config,
 		redis:              NewRedis(config.Redis),
 		httpServer:         NewHttpServer(config.Http),
 		moduleManager:      moduleManager,
-		waitingForResponse: make(map[string]chan structs.Message[[]byte], 10),
+		waitingForResponse: make(map[string]chan common.Message[[]byte], 10),
 	}
 	moduleManager.SetTransportManager(tm)
 
 	return tm
 }
 
-func (tm *TransportManager) GetRedis() interfaces.Redis {
+func (tm *TransportManager) GetRedis() common.Redis {
 	return tm.redis
 }
 
-func (tm *TransportManager) SetModules(modules map[string]interfaces.Module) {
+func (tm *TransportManager) SetModules(modules map[string]common.Module) {
 	tm.modules = modules
 }
 
@@ -64,11 +62,11 @@ func (tm *TransportManager) Start() error {
 			return err
 		}
 
-		if err := tm.Subscribe(REDIS_TYPE, types.CHAN_MESSAGE, tm.ReceiveMessage); err != nil {
+		if err := tm.Subscribe(REDIS_TYPE, common.CHAN_MESSAGE, tm.ReceiveMessage); err != nil {
 			return err
 		}
 
-		if err := tm.Subscribe(REDIS_TYPE, types.CHAN_MESSAGE_RESPONSE, tm.ReceiveMessageResponse); err != nil {
+		if err := tm.Subscribe(REDIS_TYPE, common.CHAN_MESSAGE_RESPONSE, tm.ReceiveMessageResponse); err != nil {
 			return err
 		}
 	}
@@ -103,8 +101,8 @@ func (tm *TransportManager) Stop() error {
 	return nil
 }
 
-func (tm *TransportManager) Send(transportType types.TransportType, targetServer string, targetModule string, targetAction string, payload []byte, waitForResponse bool, responseHash string) (any, error) {
-	res, err := tm.Publish(transportType, types.CHAN_MESSAGE, targetServer, targetModule, targetAction, payload, waitForResponse, responseHash)
+func (tm *TransportManager) Send(transportType common.TransportType, targetServer string, targetModule string, targetAction string, payload []byte, waitForResponse bool, responseHash string) (any, error) {
+	res, err := tm.Publish(transportType, common.CHAN_MESSAGE, targetServer, targetModule, targetAction, payload, waitForResponse, responseHash)
 
 	if err != nil {
 		return nil, err
@@ -113,8 +111,8 @@ func (tm *TransportManager) Send(transportType types.TransportType, targetServer
 	return res, nil
 }
 
-func (tm *TransportManager) SendResponse(transportType types.TransportType, targetServer string, targetModule string, targetAction string, payload []byte, waitForResponse bool, responseHash string) (any, error) {
-	res, err := tm.Publish(transportType, types.CHAN_MESSAGE_RESPONSE, targetServer, targetModule, targetAction, payload, waitForResponse, responseHash)
+func (tm *TransportManager) SendResponse(transportType common.TransportType, targetServer string, targetModule string, targetAction string, payload []byte, waitForResponse bool, responseHash string) (any, error) {
+	res, err := tm.Publish(transportType, common.CHAN_MESSAGE_RESPONSE, targetServer, targetModule, targetAction, payload, waitForResponse, responseHash)
 
 	if err != nil {
 		return nil, err
@@ -123,7 +121,7 @@ func (tm *TransportManager) SendResponse(transportType types.TransportType, targ
 	return res, nil
 }
 
-func (tm *TransportManager) Publish(transportType types.TransportType, channel types.Channel, targetServer string, targetModule string, targetAction string, payload []byte, waitForResponse bool, responseHash string) (any, error) {
+func (tm *TransportManager) Publish(transportType common.TransportType, channel common.Channel, targetServer string, targetModule string, targetAction string, payload []byte, waitForResponse bool, responseHash string) (any, error) {
 	switch transportType {
 	case REDIS_TYPE:
 		{
@@ -147,7 +145,7 @@ func (tm *TransportManager) Publish(transportType types.TransportType, channel t
 				timer := time.NewTimer(time.Duration(1) * time.Second)
 
 				tm.waitingForResponseLock.Lock()
-				tm.waitingForResponse[msg.Hash] = make(chan structs.Message[[]byte])
+				tm.waitingForResponse[msg.Hash] = make(chan common.Message[[]byte])
 				tm.waitingForResponseLock.Unlock()
 
 			Loop:
@@ -189,7 +187,7 @@ func (tm *TransportManager) Publish(transportType types.TransportType, channel t
 	}
 }
 
-func (tm *TransportManager) Subscribe(transportType types.TransportType, channel types.Channel, callback func(payload []byte) (types.Response, error)) error {
+func (tm *TransportManager) Subscribe(transportType common.TransportType, channel common.Channel, callback func(payload []byte) (common.Response, error)) error {
 	switch transportType {
 	case REDIS_TYPE:
 		{
@@ -200,8 +198,8 @@ func (tm *TransportManager) Subscribe(transportType types.TransportType, channel
 	}
 }
 
-func (tm *TransportManager) ReceiveMessage(payload []byte) (types.Response, error) {
-	var message *structs.Message[[]byte] = &structs.Message[[]byte]{}
+func (tm *TransportManager) ReceiveMessage(payload []byte) (common.Response, error) {
+	var message *common.Message[[]byte] = &common.Message[[]byte]{}
 
 	err := json.Unmarshal(payload, message)
 	if err != nil {
@@ -243,8 +241,8 @@ func (tm *TransportManager) ReceiveMessage(payload []byte) (types.Response, erro
 	return nil, nil
 }
 
-func (tm *TransportManager) ReceiveMessageResponse(payload []byte) (types.Response, error) {
-	var message *structs.Message[[]byte] = &structs.Message[[]byte]{}
+func (tm *TransportManager) ReceiveMessageResponse(payload []byte) (common.Response, error) {
+	var message *common.Message[[]byte] = &common.Message[[]byte]{}
 
 	err := json.Unmarshal(payload, message)
 	if err != nil {
@@ -266,11 +264,11 @@ func (tm *TransportManager) ReceiveMessageResponse(payload []byte) (types.Respon
 	return nil, nil
 }
 
-func (tm *TransportManager) prepareMessage(targetServer string, targetModule string, targetAction string, payload []byte, waitForResponse bool, responseHash string) (*structs.Message[[]byte], error) {
-	msg := &structs.Message[[]byte]{
+func (tm *TransportManager) prepareMessage(targetServer string, targetModule string, targetAction string, payload []byte, waitForResponse bool, responseHash string) (*common.Message[[]byte], error) {
+	msg := &common.Message[[]byte]{
 		FromID:   tm.serverName,
 		TargetID: targetServer,
-		TargetAction: structs.TargetAction{
+		TargetAction: common.TargetAction{
 			Module: targetModule,
 			Action: targetAction,
 		},

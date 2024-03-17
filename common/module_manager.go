@@ -1,4 +1,4 @@
-package interfaces
+package common
 
 type ModuleManager interface {
 	Start() error

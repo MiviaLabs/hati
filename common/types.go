@@ -1,8 +1,4 @@
-package types
-
-import (
-	"github.com/MiviaLabs/hati/common/structs"
-)
+package common
 
 type Channel string
 type DeliveryMethod string
@@ -22,7 +18,7 @@ const (
 	DELIVERY_ALL    DeliveryMethod = "all"
 )
 
-type ActionHandler func(payload structs.Message[[]byte]) (Response, error)
+type ActionHandler func(ctx *HatiContext, payload Message[[]byte]) (Response, error)
 
 const (
 	GET HttpMethod = iota
@@ -57,5 +53,5 @@ func (m HttpMethod) String() string {
 type Action struct {
 	Handler ActionHandler
 	Name    string
-	Route   *structs.ActionRoute
+	Route   *ActionRoute
 }

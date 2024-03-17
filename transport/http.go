@@ -5,9 +5,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/MiviaLabs/hati/common/interfaces"
-	"github.com/MiviaLabs/hati/common/structs"
-	"github.com/MiviaLabs/hati/common/types"
+	"github.com/MiviaLabs/hati/common"
 	"github.com/MiviaLabs/hati/log"
 	routing "github.com/qiangxue/fasthttp-routing"
 	"github.com/valyala/fasthttp"
@@ -28,10 +26,10 @@ type HttpCors struct {
 }
 
 type HttpServer struct {
-	interfaces.HttpServer
+	common.HttpServer
 	config           HttpConfig
-	transportManager interfaces.TransportManager
-	modules          *map[string]interfaces.Module
+	transportManager common.TransportManager
+	modules          *map[string]common.Module
 	router           *routing.Router
 	stopChan         chan bool
 	stopWg           sync.WaitGroup
@@ -44,7 +42,7 @@ func NewHttpServer(config HttpConfig) *HttpServer {
 		stopChan: make(chan bool),
 	}
 }
-func (s *HttpServer) SetTransportManager(transportManager interfaces.TransportManager) {
+func (s *HttpServer) SetTransportManager(transportManager common.TransportManager) {
 	s.transportManager = transportManager
 }
 
@@ -52,7 +50,7 @@ func (s *HttpServer) AddRoute() error {
 	return nil
 }
 
-func (s *HttpServer) SetModules(modules *map[string]interfaces.Module) {
+func (s *HttpServer) SetModules(modules *map[string]common.Module) {
 	s.modules = modules
 }
 
@@ -98,12 +96,13 @@ func (s *HttpServer) Start() error {
 				for _, httpMethod := range action.Route.Methods {
 
 					switch httpMethod {
-					case types.GET.String():
+					case common.GET.String():
 						{
 							s.router.Get(action.Route.Path, func(c *routing.Context) error {
-								res, err := action.Handler(structs.Message[[]byte]{
-									RoutingContext: c,
-								})
+								res, err := action.Handler(&common.HatiContext{
+									RoutingContext:   c,
+									TransportManager: &s.transportManager,
+								}, common.Message[[]byte]{})
 
 								if err != nil {
 									return err
@@ -120,12 +119,13 @@ func (s *HttpServer) Start() error {
 							})
 							break
 						}
-					case types.POST.String():
+					case common.POST.String():
 						{
 							s.router.Post(action.Route.Path, func(c *routing.Context) error {
-								res, err := action.Handler(structs.Message[[]byte]{
-									RoutingContext: c,
-								})
+								res, err := action.Handler(&common.HatiContext{
+									RoutingContext:   c,
+									TransportManager: &s.transportManager,
+								}, common.Message[[]byte]{})
 
 								if err != nil {
 									return err
@@ -142,12 +142,13 @@ func (s *HttpServer) Start() error {
 							})
 							break
 						}
-					case types.PATCH.String():
+					case common.PATCH.String():
 						{
 							s.router.Patch(action.Route.Path, func(c *routing.Context) error {
-								res, err := action.Handler(structs.Message[[]byte]{
-									RoutingContext: c,
-								})
+								res, err := action.Handler(&common.HatiContext{
+									RoutingContext:   c,
+									TransportManager: &s.transportManager,
+								}, common.Message[[]byte]{})
 
 								if err != nil {
 									return err
@@ -164,12 +165,13 @@ func (s *HttpServer) Start() error {
 							})
 							break
 						}
-					case types.PUT.String():
+					case common.PUT.String():
 						{
 							s.router.Put(action.Route.Path, func(c *routing.Context) error {
-								res, err := action.Handler(structs.Message[[]byte]{
-									RoutingContext: c,
-								})
+								res, err := action.Handler(&common.HatiContext{
+									RoutingContext:   c,
+									TransportManager: &s.transportManager,
+								}, common.Message[[]byte]{})
 
 								if err != nil {
 									return err
@@ -186,12 +188,13 @@ func (s *HttpServer) Start() error {
 							})
 							break
 						}
-					case types.DELETE.String():
+					case common.DELETE.String():
 						{
 							s.router.Delete(action.Route.Path, func(c *routing.Context) error {
-								res, err := action.Handler(structs.Message[[]byte]{
-									RoutingContext: c,
-								})
+								res, err := action.Handler(&common.HatiContext{
+									RoutingContext:   c,
+									TransportManager: &s.transportManager,
+								}, common.Message[[]byte]{})
 
 								if err != nil {
 									return err

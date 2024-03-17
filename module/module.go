@@ -3,9 +3,7 @@ package module
 import (
 	"errors"
 
-	"github.com/MiviaLabs/hati/common/interfaces"
-	"github.com/MiviaLabs/hati/common/structs"
-	"github.com/MiviaLabs/hati/common/types"
+	"github.com/MiviaLabs/hati/common"
 	"github.com/MiviaLabs/hati/log"
 )
 
@@ -14,18 +12,18 @@ var (
 )
 
 type Module struct {
-	interfaces.Module
+	common.Module
 	Name             string
-	actions          map[string]*types.Action
-	beforeStart      func(m interfaces.Module)
-	beforeStop       func(m interfaces.Module)
-	transportManager interfaces.TransportManager
+	actions          map[string]*common.Action
+	beforeStart      func(m common.Module)
+	beforeStop       func(m common.Module)
+	transportManager common.TransportManager
 }
 
 func New(name string) *Module {
 	return &Module{
 		Name:    name,
-		actions: make(map[string]*types.Action),
+		actions: make(map[string]*common.Action),
 	}
 }
 
@@ -33,23 +31,23 @@ func (m *Module) GetName() string {
 	return m.Name
 }
 
-func (m *Module) GetActions() *map[string]*types.Action {
+func (m *Module) GetActions() *map[string]*common.Action {
 	return &m.actions
 }
-func (m *Module) SetTransportManager(tm interfaces.TransportManager) {
+func (m *Module) SetTransportManager(tm common.TransportManager) {
 	m.transportManager = tm
 }
 
-func (m *Module) GetTransportManager() interfaces.TransportManager {
+func (m *Module) GetTransportManager() common.TransportManager {
 	return m.transportManager
 }
 
-func (m *Module) AddAction(name string, handler types.ActionHandler, route *structs.ActionRoute) error {
+func (m *Module) AddAction(name string, handler common.ActionHandler, route *common.ActionRoute) error {
 	if m.actions[name] != nil {
 		return ErrModuleExist
 	}
 
-	m.actions[name] = &types.Action{
+	m.actions[name] = &common.Action{
 		Name:    name,
 		Route:   route,
 		Handler: handler,
@@ -62,18 +60,18 @@ func (m *Module) Start() error {
 	log.Debug("starting module: " + m.Name)
 
 	if m.beforeStart != nil {
-		c := interfaces.Module(m)
+		c := common.Module(m)
 		m.beforeStart(c)
 	}
 
 	return nil
 }
 
-func (m *Module) BeforeStart(callback func(m interfaces.Module)) {
+func (m *Module) BeforeStart(callback func(m common.Module)) {
 	m.beforeStart = callback
 }
 
-func (m *Module) BeforeStop(callback func(m interfaces.Module)) {
+func (m *Module) BeforeStop(callback func(m common.Module)) {
 	m.beforeStop = callback
 }
 
@@ -81,17 +79,17 @@ func (m *Module) Stop() error {
 	log.Debug("stopping module: " + m.Name)
 
 	if m.beforeStop != nil {
-		c := interfaces.Module(m)
+		c := common.Module(m)
 		m.beforeStop(c)
 	}
 
 	return nil
 }
 
-func (m *Module) CallAction(name string, payload *structs.Message[[]byte]) (types.Response, error) {
+func (m *Module) CallAction(name string, payload *common.Message[[]byte]) (common.Response, error) {
 	if m.actions[name] == nil {
 		return nil, errors.New("action does not exist")
 	}
 
-	return m.actions[name].Handler(*payload)
+	return m.actions[name].Handler(&common.HatiContext{}, *payload)
 }
