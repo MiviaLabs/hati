@@ -50,6 +50,10 @@ func NewTransportManager(serverName string, config TransportManagerConfig, modul
 	return tm
 }
 
+func (tm *TransportManager) GetRedis() interfaces.Redis {
+	return tm.redis
+}
+
 func (tm *TransportManager) SetModules(modules map[string]interfaces.Module) {
 	tm.modules = modules
 }

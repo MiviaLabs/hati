@@ -1,6 +1,8 @@
 package types
 
-import "github.com/MiviaLabs/hati/common/structs"
+import (
+	"github.com/MiviaLabs/hati/common/structs"
+)
 
 type Channel string
 type DeliveryMethod string

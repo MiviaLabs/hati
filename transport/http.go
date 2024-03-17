@@ -14,9 +14,17 @@ import (
 )
 
 type HttpConfig struct {
-	On   bool   `yaml:"on" json:"on"`
-	Host string `yaml:"host" json:"host"`
-	Port string `yaml:"port" json:"port"`
+	On   bool      `yaml:"on" json:"on"`
+	Host string    `yaml:"host" json:"host"`
+	Port string    `yaml:"port" json:"port"`
+	Cors *HttpCors `yaml:"cors" json:"cors"`
+}
+
+type HttpCors struct {
+	AllowHeaders     string `yaml:"allow_headers" json:"allow_headers"`
+	AllowCredentials string `yaml:"allow_credentials" json:"allow_credentials"`
+	AllowOrigin      string `yaml:"allow_origin" json:"allow_origin"`
+	AllowMethod      string `yaml:"allow_method" json:"allow_method"`
 }
 
 type HttpServer struct {
@@ -54,13 +62,33 @@ func (s *HttpServer) Start() error {
 	}
 
 	s.router.Use(func(c *routing.Context) error {
-		c.Response.Header.Set("Access-Control-Allow-Headers", "*")
-		c.Response.Header.Set("Access-Control-Allow-Credentials", "true")
-		c.Response.Header.Set("Access-Control-Allow-Origin", "*")
-		c.Response.Header.Set("Access-Control-Allow-Method", "*")
+		c.Response.Header.Set("Content-Type", "application/json")
 
 		return c.Next()
 	})
+
+	if s.config.Cors != nil {
+		s.router.Use(func(c *routing.Context) error {
+
+			if s.config.Cors.AllowCredentials != "" {
+				c.Response.Header.Set("Access-Control-Allow-Credentials", s.config.Cors.AllowCredentials)
+			}
+
+			if s.config.Cors.AllowHeaders != "" {
+				c.Response.Header.Set("Access-Control-Allow-Headers", s.config.Cors.AllowHeaders)
+			}
+
+			if s.config.Cors.AllowOrigin != "" {
+				c.Response.Header.Set("Access-Control-Allow-Origin", s.config.Cors.AllowOrigin)
+			}
+
+			if s.config.Cors.AllowMethod != "" {
+				c.Response.Header.Set("Access-Control-Allow-Method", s.config.Cors.AllowMethod)
+			}
+
+			return c.Next()
+		})
+	}
 
 	for _, module := range *s.modules {
 		moduleActions := module.GetActions()

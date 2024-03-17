@@ -15,22 +15,24 @@ Feel free to play around and leave feedback :)
 
 ## What is that?
 
-**Hati** gives you - out of the box - layer of communication for your distributed application or api, it has couple of integrations with different protocols which can be used for building your next project.
+**Hati** gives you - out of the box - layer of communication for your distributed application or api, it has couple of
+integrations with different protocols which can be used for building your next project.
 
 These integrations are:
 
 - [x] Redis
 
   - [ ] Presistent messages - streams
-
+  - [ ] Redis message queue - RMQ
   - [x] Not persistent messages - pub/sub
   - [x] Waiting for response from remote - timeout 1s
   - [x] Option to send without waiting for response from remote
 
-- [ ] RabbitMQ
 - [ ] P2P Protocol
 
-Hati server works on a simple concept of modules and actions (methods) - they can receive payloads through internal channels from other Hati servers which are in the network, as well as through HTTP requests in case if your are building api.
+Hati server works on a simple concept of modules and actions (methods) - they can receive payloads through internal
+channels from other Hati servers which are in the network, as well as through HTTP requests in case if your are building
+api.
 
 Hait comes with few handy integrations for different databases:
 
