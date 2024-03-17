@@ -51,3 +51,9 @@ func (m HttpMethod) String() string {
 		return "Invalid http method"
 	}
 }
+
+type Action struct {
+	Handler ActionHandler
+	Name    string
+	Route   *structs.ActionRoute
+}

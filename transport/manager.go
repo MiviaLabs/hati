@@ -3,7 +3,6 @@ package transport
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -71,9 +70,8 @@ func (tm *TransportManager) Start() error {
 	}
 
 	if tm.config.Http.On {
-
+		tm.httpServer.SetModules(tm.moduleManager.GetModules())
 		tm.httpServer.SetTransportManager(tm)
-		fmt.Println(tm.config.Http)
 
 		if err := tm.httpServer.Start(); err != nil {
 			return err
