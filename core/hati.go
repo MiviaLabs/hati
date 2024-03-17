@@ -38,11 +38,11 @@ func (h Hati) Start() error {
 
 	_ = godotenv.Load()
 
-	if err := h.transportManager.Start(); err != nil {
+	if err := h.moduleManager.Start(); err != nil {
 		return err
 	}
 
-	if err := h.moduleManager.Start(); err != nil {
+	if err := h.transportManager.Start(); err != nil {
 		return err
 	}
 

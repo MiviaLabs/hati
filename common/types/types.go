@@ -21,3 +21,39 @@ const (
 )
 
 type ActionHandler func(payload structs.Message[[]byte]) (Response, error)
+
+const (
+	GET HttpMethod = iota
+	POST
+	PATCH
+	PUT
+	DELETE
+	OPTIONS
+)
+
+type HttpMethod uint8
+
+func (m HttpMethod) String() string {
+	switch m {
+	case GET:
+		return "GET"
+	case POST:
+		return "POST"
+	case PATCH:
+		return "PATCH"
+	case PUT:
+		return "PUT"
+	case DELETE:
+		return "DELETE"
+	case OPTIONS:
+		return "OPTIONS"
+	default:
+		return "Invalid http method"
+	}
+}
+
+type Action struct {
+	Handler ActionHandler
+	Name    string
+	Route   *structs.ActionRoute
+}

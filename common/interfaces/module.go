@@ -8,7 +8,8 @@ import (
 type Module interface {
 	SetTransportManager(tm TransportManager)
 	GetTransportManager() TransportManager
-	AddAction(name string, handler types.ActionHandler) error
+	AddAction(name string, handler types.ActionHandler, route *structs.ActionRoute) error
+	GetActions() *map[string]*types.Action
 	CallAction(name string, payload *structs.Message[[]byte]) (types.Response, error)
 	Start() error
 	BeforeStart(callback func(m Module))

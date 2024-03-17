@@ -12,4 +12,5 @@ type TransportManager interface {
 	Subscribe(transportType types.TransportType, channel types.Channel, callback func(payload []byte) (types.Response, error)) error
 	ReceiveMessage(payload []byte) (types.Response, error)
 	ReceiveMessageResponse(payload []byte) (types.Response, error)
+	// SetHttpRoute(methods) error
 }

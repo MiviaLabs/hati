@@ -32,6 +32,10 @@ func (m *Manager) AddModule(modules ...interfaces.Module) error {
 	return nil
 }
 
+func (m *Manager) GetModules() *map[string]interfaces.Module {
+	return &m.modules
+}
+
 func (m *Manager) SetTransportManager(tm interfaces.TransportManager) {
 	m.transportManager = tm
 }
