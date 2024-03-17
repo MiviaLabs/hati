@@ -1,5 +1,6 @@
 package common
 
+// HttpServer interface for http server
 type HttpServer interface {
 	Start() error
 	Stop() error
