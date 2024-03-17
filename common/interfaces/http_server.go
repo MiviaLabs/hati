@@ -1,6 +1,6 @@
 package interfaces
 
-type HttpManager interface {
+type HttpServer interface {
 	Start() error
 	Stop() error
 	SetTransportManager(transportManager TransportManager)

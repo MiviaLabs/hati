@@ -51,6 +51,14 @@ I'll tell you later :-)
 
 ### Useful commands
 
+**Build with stack/heap log**
+
 ```
 go build -gcflags="-m" main.go
+```
+
+**Publish Go package**
+
+```
+GOPROXY=proxy.golang.org go list -m github.com/MiviaLabs/hati@v0.1.0-dev
 ```

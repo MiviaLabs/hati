@@ -3,6 +3,7 @@ package transport
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -25,6 +26,7 @@ type TransportManager struct {
 	serverName             string
 	config                 TransportManagerConfig
 	redis                  *Redis
+	httpServer             *HttpServer
 	moduleManager          interfaces.ModuleManager
 	waitingForResponse     map[string]chan structs.Message[[]byte]
 	waitingForResponseLock sync.Mutex
@@ -32,6 +34,7 @@ type TransportManager struct {
 
 type TransportManagerConfig struct {
 	Redis RedisConfig `yaml:"redis" json:"redis"`
+	Http  HttpConfig  `yaml:"http" json:"http"`
 }
 
 func NewTransportManager(serverName string, config TransportManagerConfig, moduleManager interfaces.ModuleManager) *TransportManager {
@@ -39,6 +42,7 @@ func NewTransportManager(serverName string, config TransportManagerConfig, modul
 		serverName:         serverName,
 		config:             config,
 		redis:              NewRedis(config.Redis),
+		httpServer:         NewHttpServer(config.Http),
 		moduleManager:      moduleManager,
 		waitingForResponse: make(map[string]chan structs.Message[[]byte], 10),
 	}
@@ -53,7 +57,9 @@ func (tm *TransportManager) SetModules(modules map[string]interfaces.Module) {
 
 func (tm *TransportManager) Start() error {
 	if tm.config.Redis.On {
-		tm.redis.Start()
+		if err := tm.redis.Start(); err != nil {
+			return err
+		}
 
 		if err := tm.Subscribe(REDIS_TYPE, types.CHAN_MESSAGE, tm.ReceiveMessage); err != nil {
 			return err
@@ -64,11 +70,27 @@ func (tm *TransportManager) Start() error {
 		}
 	}
 
+	if tm.config.Http.On {
+
+		tm.httpServer.SetTransportManager(tm)
+		fmt.Println(tm.config.Http)
+
+		if err := tm.httpServer.Start(); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
 func (tm *TransportManager) Stop() error {
 	log.Debug("stopping transport manager")
+
+	if tm.config.Http.On {
+		if err := tm.httpServer.Stop(); err != nil {
+			return err
+		}
+	}
 
 	if tm.config.Redis.On {
 		if err := tm.redis.Stop(); err != nil {
