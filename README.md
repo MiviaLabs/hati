@@ -45,7 +45,9 @@ Hait comes with few handy integrations for different databases:
 
 I'll tell you later :-)
 
----
+## Getting Started
+
+- [Repository with Examples](https://github.com/miviaLabs/hati-example)
 
 ### Useful commands
 
