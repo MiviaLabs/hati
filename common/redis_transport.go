@@ -12,4 +12,8 @@ type Redis interface {
 	Stop() error
 	Client() *redis.Client
 	RmqClient() *rmq.Connection
+	// CreateQueue(name string, consumer interface{}) error
+	// FindQueue(name string) error
+	// StartQueue(name string) error
+	// StopQueue(name string) error
 }

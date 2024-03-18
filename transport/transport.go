@@ -9,7 +9,3 @@ type Transport interface {
 	Publish(channel common.Channel, payload []byte) error
 	Subscribe(channel common.Channel, callback func(payload []byte)) error
 }
-
-// type Transport struct{}
-
-// func New() {}
