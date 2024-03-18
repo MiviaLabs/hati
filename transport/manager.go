@@ -8,6 +8,7 @@ import (
 
 	"github.com/MiviaLabs/hati/common"
 	"github.com/MiviaLabs/hati/log"
+	"github.com/MiviaLabs/hati/server"
 )
 
 var (
@@ -23,15 +24,15 @@ type TransportManager struct {
 	serverName             string
 	config                 TransportManagerConfig
 	redis                  *Redis
-	httpServer             *HttpServer
+	httpServer             common.HttpServer
 	moduleManager          common.ModuleManager
 	waitingForResponse     map[string]chan common.Message[[]byte]
 	waitingForResponseLock sync.Mutex
 }
 
 type TransportManagerConfig struct {
-	Redis RedisConfig `yaml:"redis" json:"redis"`
-	Http  HttpConfig  `yaml:"http" json:"http"`
+	Redis RedisConfig       `yaml:"redis" json:"redis"`
+	Http  server.HttpConfig `yaml:"http" json:"http"`
 }
 
 func NewTransportManager(serverName string, config TransportManagerConfig, moduleManager common.ModuleManager) *TransportManager {
@@ -39,7 +40,7 @@ func NewTransportManager(serverName string, config TransportManagerConfig, modul
 		serverName:         serverName,
 		config:             config,
 		redis:              NewRedis(config.Redis),
-		httpServer:         NewHttpServer(config.Http),
+		httpServer:         server.NewHttpServer(config.Http),
 		moduleManager:      moduleManager,
 		waitingForResponse: make(map[string]chan common.Message[[]byte], 10),
 	}
