@@ -1,6 +1,9 @@
 package common
 
-import "github.com/redis/go-redis/v9"
+import (
+	"github.com/adjust/rmq/v5"
+	"github.com/redis/go-redis/v9"
+)
 
 type Redis interface {
 	Start() error
@@ -8,4 +11,5 @@ type Redis interface {
 	Subscribe(channel Channel, callback func(payload []byte) (Response, error)) error
 	Stop() error
 	Client() *redis.Client
+	RmqClient() *rmq.Connection
 }

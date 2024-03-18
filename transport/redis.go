@@ -70,6 +70,13 @@ func (r *Redis) Start() error {
 		r.subscriberClient = redis.NewClient(options)
 		r.publisherClient = redis.NewClient(options)
 
+		errChan := make(chan error)
+		var err error
+
+		r.rmqConnection, err = rmq.OpenConnection("hati", "tcp", r.config.Host+":"+r.config.Port, 1, errChan)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -107,6 +114,10 @@ func (r *Redis) Subscribe(channel common.Channel, callback func(payload []byte) 
 
 func (r *Redis) Client() *redis.Client {
 	return r.client
+}
+
+func (r *Redis) RmqClient() *rmq.Connection {
+	return &r.rmqConnection
 }
 
 func (r *Redis) Stop() error {
