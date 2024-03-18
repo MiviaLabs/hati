@@ -31,7 +31,7 @@ type RedisConfig struct {
 
 type Redis struct {
 	Transport
-	Client           *redis.Client
+	client           *redis.Client
 	config           RedisConfig
 	publisherClient  *redis.Client
 	subscriberClient *redis.Client
@@ -66,9 +66,10 @@ func (r *Redis) Start() error {
 			// TLSConfig: &tls.Config{},
 		}
 
-		// r.Client = redis.NewClient(options)
+		r.client = redis.NewClient(options)
 		r.subscriberClient = redis.NewClient(options)
 		r.publisherClient = redis.NewClient(options)
+
 	}
 
 	return nil
@@ -104,10 +105,17 @@ func (r *Redis) Subscribe(channel common.Channel, callback func(payload []byte) 
 	return ErrRedisAlreadySubscribed(channel)
 }
 
+func (r *Redis) Client() *redis.Client {
+	return r.client
+}
+
 func (r *Redis) Stop() error {
 	log.Debug("stopping redis")
 
 	if r.config.On {
+		log.Debug("  stopping redis client")
+		r.client.Close()
+
 		log.Debug("  stopping redis publishers")
 		// for _, publisher := range r.publishers {
 		// 	publisher.Stop()
