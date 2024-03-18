@@ -99,10 +99,10 @@ func (s *HttpServer) Start() error {
 					case common.GET.String():
 						{
 							s.router.Get(action.Route.Path, func(c *routing.Context) error {
-								res, err := action.Handler(&common.HatiContext{
+								res, err := action.Handler(&common.HatiRequest{
 									RoutingContext:   c,
 									TransportManager: &s.transportManager,
-								}, common.Message[[]byte]{})
+								})
 
 								if err != nil {
 									return err
@@ -122,10 +122,10 @@ func (s *HttpServer) Start() error {
 					case common.POST.String():
 						{
 							s.router.Post(action.Route.Path, func(c *routing.Context) error {
-								res, err := action.Handler(&common.HatiContext{
+								res, err := action.Handler(&common.HatiRequest{
 									RoutingContext:   c,
 									TransportManager: &s.transportManager,
-								}, common.Message[[]byte]{})
+								})
 
 								if err != nil {
 									return err
@@ -145,10 +145,10 @@ func (s *HttpServer) Start() error {
 					case common.PATCH.String():
 						{
 							s.router.Patch(action.Route.Path, func(c *routing.Context) error {
-								res, err := action.Handler(&common.HatiContext{
+								res, err := action.Handler(&common.HatiRequest{
 									RoutingContext:   c,
 									TransportManager: &s.transportManager,
-								}, common.Message[[]byte]{})
+								})
 
 								if err != nil {
 									return err
@@ -168,10 +168,10 @@ func (s *HttpServer) Start() error {
 					case common.PUT.String():
 						{
 							s.router.Put(action.Route.Path, func(c *routing.Context) error {
-								res, err := action.Handler(&common.HatiContext{
+								res, err := action.Handler(&common.HatiRequest{
 									RoutingContext:   c,
 									TransportManager: &s.transportManager,
-								}, common.Message[[]byte]{})
+								})
 
 								if err != nil {
 									return err
@@ -191,10 +191,10 @@ func (s *HttpServer) Start() error {
 					case common.DELETE.String():
 						{
 							s.router.Delete(action.Route.Path, func(c *routing.Context) error {
-								res, err := action.Handler(&common.HatiContext{
+								res, err := action.Handler(&common.HatiRequest{
 									RoutingContext:   c,
 									TransportManager: &s.transportManager,
-								}, common.Message[[]byte]{})
+								})
 
 								if err != nil {
 									return err

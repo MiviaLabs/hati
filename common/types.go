@@ -18,7 +18,7 @@ const (
 	DELIVERY_ALL    DeliveryMethod = "all"
 )
 
-type ActionHandler func(ctx *HatiContext, payload Message[[]byte]) (Response, error)
+type ActionHandler func(ctx *HatiRequest) (Response, error)
 
 const (
 	GET HttpMethod = iota

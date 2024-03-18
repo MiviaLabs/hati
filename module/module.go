@@ -91,5 +91,7 @@ func (m *Module) CallAction(name string, payload *common.Message[[]byte]) (commo
 		return nil, errors.New("action does not exist")
 	}
 
-	return m.actions[name].Handler(&common.HatiContext{}, *payload)
+	return m.actions[name].Handler(&common.HatiRequest{
+		Message: *payload,
+	})
 }
